@@ -50,9 +50,3 @@ js/osu-writer.js    Write modified .osu content
 js/replay-writer.js Build new .osr binary (LZMA compression)
 js/vendor/          Third-party libraries (LZMA-JS)
 ```
-
-## Limitations
-
-- osu!standard mode only
-- Spinners stay at playfield center (256, 192)
-- Replay mods (HR, DT, etc.) are detected and applied
