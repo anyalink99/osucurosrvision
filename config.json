@@ -1,0 +1,15 @@
+{
+  "replay": {
+    "health_percent": 88,
+    "score": -1,
+    "date_years_offset": -77
+  },
+  "metadata": {
+    "difficulty_name_suffix": " (Cursor Vision)"
+  },
+  "paths": {
+    "input": "./input/",
+    "output": "./output/",
+    "output_filename_suffix": "_cursor_vision"
+  }
+}

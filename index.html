@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>osu! Cursor Vision</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1 class="title">osu! Cursor Vision</h1>
+      <p class="tagline">Build a map from your replay's cursor path. Drop .osr and .osu files, get a new map where hit objects follow the cursor.</p>
+    </header>
+
+    <main class="main">
+      <div class="drop-row">
+        <div id="drop-zone-osr" class="drop-zone-half" data-type="osr">
+          <input type="file" id="file-input-osr" class="file-input" accept=".osr">
+          <div class="drop-content">
+            <span class="drop-icon" aria-hidden="true">&uarr;</span>
+            <span class="drop-label">.osr</span>
+            <span class="drop-text" id="osr-drop-text">Replay &mdash; drop or click</span>
+            <div id="osr-file-display" class="file-in-zone hidden">
+              <span class="file-in-zone-name" id="osr-file-name"></span>
+              <button type="button" class="file-in-zone-remove" id="osr-file-remove" title="Remove" aria-label="Remove replay">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div id="drop-zone-osu" class="drop-zone-half" data-type="osu">
+          <input type="file" id="file-input-osu" class="file-input" accept=".osu">
+          <div class="drop-content">
+            <span class="drop-icon" aria-hidden="true">&uarr;</span>
+            <span class="drop-label">.osu</span>
+            <span class="drop-text" id="osu-drop-text">Beatmap &mdash; drop or click</span>
+            <div id="osu-file-display" class="file-in-zone hidden">
+              <span class="file-in-zone-name" id="osu-file-name"></span>
+              <button type="button" class="file-in-zone-remove" id="osu-file-remove" title="Remove" aria-label="Remove beatmap">&times;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="progress-area" class="progress-area hidden">
+        <div class="progress-bar">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <p class="progress-step"><span id="progress-step"></span> <span id="progress-detail" class="progress-detail"></span></p>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="convert-btn" class="btn btn-primary" disabled>Convert</button>
+        <button type="button" id="settings-toggle" class="btn btn-settings">Settings</button>
+      </div>
+
+      <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-group">
+          <label class="settings-label" for="cfg-difficulty-suffix">Difficulty name suffix</label>
+          <input type="text" id="cfg-difficulty-suffix" class="settings-input" value=" (Cursor Vision)">
+        </div>
+        <div class="settings-group">
+          <label class="settings-label" for="cfg-filename-suffix">Output filename suffix</label>
+          <input type="text" id="cfg-filename-suffix" class="settings-input" value="_cursor_vision">
+        </div>
+        <div class="settings-row">
+          <div class="settings-group">
+            <label class="settings-label" for="cfg-health">Health %</label>
+            <input type="number" id="cfg-health" class="settings-input" value="88" min="0" max="100">
+          </div>
+          <div class="settings-group">
+            <label class="settings-label" for="cfg-score">Score</label>
+            <input type="number" id="cfg-score" class="settings-input" value="-1">
+          </div>
+          <div class="settings-group">
+            <label class="settings-label" for="cfg-date-offset">Date years offset</label>
+            <input type="number" id="cfg-date-offset" class="settings-input" value="-77">
+          </div>
+        </div>
+      </div>
+
+      <p id="error-message" class="error hidden" role="alert"></p>
+
+      <section id="results-section" class="results hidden" aria-label="Results">
+        <h2 class="results-title">Results</h2>
+        <ul id="results-list" class="results-list"></ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>osu!standard only. Spinners stay at center. Replay mods (e.g. HR) are applied.</p>
+    </footer>
+  </div>
+
+  <script src="js/vendor/lzma_worker.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/md5.js"></script>
+  <script src="js/replay-parser.js"></script>
+  <script src="js/osu-parser.js"></script>
+  <script src="js/cursor-path.js"></script>
+  <script src="js/map-adapter.js"></script>
+  <script src="js/osu-writer.js"></script>
+  <script src="js/replay-writer.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
