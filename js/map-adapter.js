@@ -69,6 +69,8 @@ const MapAdapter = (function () {
     const [replayMinMs, replayMaxMs] = CursorPath.pathTimeBounds(path);
     const newTimingLines = [];
 
+    function flipY(y) { return hardRock ? 384 - y : y; }
+
     function inReplayRange(tMs) {
       return tMs >= replayMinMs && tMs <= replayMaxMs;
     }
@@ -78,7 +80,7 @@ const MapAdapter = (function () {
       if (bounds != null) {
         [x, y] = CursorPath.clampToBounds(x, y, bounds[0], bounds[1], bounds[2], bounds[3]);
       }
-      return [Math.round(x), Math.round(y)];
+      return [Math.round(x), Math.round(flipY(y))];
     }
 
     const objCoordsX = [];
@@ -165,6 +167,11 @@ const MapAdapter = (function () {
           const durationMs = endTimeMs - objTimeMs;
           const numSamples = Math.max(50, Math.min(300, Math.floor(durationMs / 12)));
           const points = sampleSliderPath(path, replayTimeMs, replayEndMs, bounds, numSamples);
+          if (hardRock) {
+            for (let i = 0; i < points.length; i++) {
+              points[i] = { x: points[i].x, y: 384 - points[i].y };
+            }
+          }
           const pathLength = polylineLength(points);
           const len = pathLength < 1 ? 1 : pathLength;
           const greenMs = bm.greenMsPerBeatAt(objTimeMs);

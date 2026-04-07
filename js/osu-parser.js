@@ -333,8 +333,10 @@ const OsuParser = (function () {
     function hitObjectsWithMods(hardRock = false, stacking = true) {
       let list = hardRock ? hitObjects.map(applyHardRock) : hitObjects.slice();
       if (stacking && formatVersion >= 6) {
-        const arMs = approachRate >= 5 ? 1950 - approachRate * 150 : 1800 - approachRate * 120;
-        let csRadius = 54.4 - 4.48 * circleSize;
+        const ar = hardRock ? Math.min(10, approachRate * 1.4) : approachRate;
+        const cs = hardRock ? Math.min(10, circleSize * 1.4) : circleSize;
+        const arMs = ar >= 5 ? 1950 - ar * 150 : 1800 - ar * 120;
+        let csRadius = 54.4 - 4.48 * cs;
         if (csRadius < 32) csRadius = 32;
         const csScale = 128 / (2 * csRadius);
         const leniency = Math.max(0, Math.min(1, stackLeniency));
