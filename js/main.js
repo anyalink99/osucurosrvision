@@ -59,8 +59,8 @@
     });
   }
 
-  function addResult(name, osuBlob, osrBlob, detail) {
-    state.results.push({ name, osuBlob, osrBlob, detail });
+  function addResult(result) {
+    state.results.push(result);
     renderResults();
   }
 
@@ -101,22 +101,17 @@
       return;
     }
     if (section) section.classList.remove("hidden");
-    const suffix = (appConfig.paths && appConfig.paths.output_filename_suffix) || "_cursor_vision";
     container.innerHTML = state.results
       .map(
-        (r) => {
-          const osuName = r.name + suffix + ".osu";
-          const osrName = r.name + suffix + ".osr";
-          return `
+        (r) => `
         <li class="result-item">
           <span class="result-name">${escapeHtml(r.name)}</span>
           ${r.detail ? `<span class="result-detail">${escapeHtml(r.detail)}</span>` : ""}
           <div class="result-actions">
-            <a href="${URL.createObjectURL(r.osuBlob)}" download="${escapeAttr(osuName)}" class="btn btn-dl">.osu</a>
-            <a href="${URL.createObjectURL(r.osrBlob)}" download="${escapeAttr(osrName)}" class="btn btn-dl">.osr</a>
+            <a href="${URL.createObjectURL(r.osuBlob)}" download="${escapeAttr(r.osuDownloadName)}" class="btn btn-dl">.osu</a>
+            <a href="${URL.createObjectURL(r.osrBlob)}" download="${escapeAttr(r.osrDownloadName)}" class="btn btn-dl">.osr</a>
           </div>
-        </li>`;
-        }
+        </li>`
       )
       .join("");
   }
@@ -256,6 +251,7 @@
         return { pairs: [], error: "Failed to parse the .osr replay file." };
       }
       const beatmapName = osuFile.name.replace(/\.osu$/i, "");
+      const replayName = osrFile.name.replace(/\.osr$/i, "");
       return {
         pairs: [
           {
@@ -263,6 +259,7 @@
             beatmapFile: beatmap.file,
             replay: replayData.replay,
             beatmapName,
+            replayName,
             beatmapContent: beatmap.content,
             beatmapMd5: beatmap.beatmapMd5,
           },
@@ -276,7 +273,7 @@
   }
 
   function processOnePair(pair, noVersionSuffix, onProgress) {
-    const { replay, beatmapContent, beatmapName, beatmapMd5 } = pair;
+    const { replay, beatmapContent, beatmapName, beatmapMd5, replayName } = pair;
     onProgress("Building map\u2026", beatmapName);
 
     const normalizedContent = normalizeOsuContentForParsing(normalizeBeatmapContent(beatmapContent));
@@ -322,14 +319,25 @@
       perfectMetadata,
       appConfig.replay || null
     ).then((osrBytes) => {
+      const filenameSuffix = (appConfig.paths && appConfig.paths.output_filename_suffix) || "_cursor_vision";
       const osuBlob = new Blob([newOsuContent], { type: "text/plain;charset=utf-8" });
       const osrBlob = new Blob([osrBytes], { type: "application/octet-stream" });
+      const osuDownloadName = beatmapName + filenameSuffix + ".osu";
+      const osrDownloadName = (replayName || beatmapName) + filenameSuffix + ".osr";
+
       let detail = "";
       if (firstChange) {
         const [[ox, oy], [nx, ny]] = firstChange;
         detail = `First: (${ox},${oy}) \u2192 (${nx},${ny})`;
       }
-      return { name: beatmapName, osuBlob, osrBlob, detail };
+      return {
+        name: beatmapName,
+        osuBlob,
+        osuDownloadName,
+        osrBlob,
+        osrDownloadName,
+        detail,
+      };
     });
   }
 
@@ -364,7 +372,7 @@
         setProgress(step, name);
       })
         .then((result) => {
-          addResult(result.name, result.osuBlob, result.osrBlob, result.detail);
+          addResult(result);
           done++;
           setProgressBar(((i + 1) / total) * 100);
           next(i + 1);
